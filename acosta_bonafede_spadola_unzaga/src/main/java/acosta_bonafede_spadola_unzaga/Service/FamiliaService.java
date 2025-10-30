@@ -17,14 +17,5 @@ public interface FamiliaService {
 	void update(Familia f) throws CheckedException; 	
 	void deleteFamilia(Long nroFamilia); 	
     void activarFamilia(Long nroFamilia) throws CheckedException;
-    
-    
-    
-
-   
-    
-   
-    
-    
-    
+      
 }

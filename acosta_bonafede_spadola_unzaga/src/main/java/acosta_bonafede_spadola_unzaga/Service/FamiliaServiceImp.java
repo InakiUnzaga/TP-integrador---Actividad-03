@@ -27,7 +27,7 @@ AsistidoService serviceAsistido;
 @Transactional 
 public void save(Familia f) throws CheckedException {
 
-serviceAsistido.save(f.getAsistidos().get(0));
+serviceAsistido.insert(f.getAsistidos().get(0));
 
 String n=f.getNombre();
 f.setNombre(n+f.getAsistidos().get(0).getDni());	

@@ -1,5 +1,7 @@
 package acosta_bonafede_spadola_unzaga.Entities;
 
+import java.util.Calendar;
+
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
@@ -39,4 +41,9 @@ public class Producto extends Ingredientes {
     public void setPrecioActual(double precioActual) {
         this.precioActual = precioActual;
     }
+
+	public Calendar getFechaVencimiento() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
