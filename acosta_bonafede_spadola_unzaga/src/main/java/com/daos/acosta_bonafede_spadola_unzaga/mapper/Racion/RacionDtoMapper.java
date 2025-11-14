@@ -10,10 +10,6 @@ import org.springframework.stereotype.Component;
 public class RacionDtoMapper {
 
     public RacionDto toDto(Racion racion) {
-        if (racion == null) {
-            return null;
-        }
-
         return RacionDto.builder()
                 .id(racion.getId())
                 .stockPreparado(racion.getStockPreparado())
