@@ -7,8 +7,7 @@ import com.daos.acosta_bonafede_spadola_unzaga.Presentation.Racion.RacionDto;
 import com.daos.acosta_bonafede_spadola_unzaga.Presentation.Racion.RacionRequestDto;
 import com.daos.acosta_bonafede_spadola_unzaga.entity.Racion;
 import com.daos.acosta_bonafede_spadola_unzaga.entity.Receta;
-import com.daos.acosta_bonafede_spadola_unzaga.mapper.Racion.RacionDtoMapper;
-import com.daos.acosta_bonafede_spadola_unzaga.mapper.Racion.RacionMapper;
+import com.daos.acosta_bonafede_spadola_unzaga.mapper.RacionDtoMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,8 +21,6 @@ public class RacionServiceImpl implements RacionService {
     private final RecetaRepository recetaRepository;
 
     private final RacionDtoMapper racionDtoMapper;
-
-    private final RacionMapper racionMapper;
 
     @Override
     public RacionDto obtenerRacion(int id) {
@@ -41,9 +38,11 @@ public class RacionServiceImpl implements RacionService {
                 () -> new ResourceNotFoundException("Receta no encontrada")
         );
 
-        Racion racionGuardada = racionMapper.toEntity(dto);
+        Racion racionGuardada = new Racion();
         racionGuardada.setReceta(receta);
+        racionGuardada.setStockPreparado(dto.getStockPreparado());
         racionGuardada.setStockRestante(dto.getStockPreparado());
+        racionGuardada.setFechaVencimiento(dto.getFechaVencimiento());
 
         racionRepository.save(racionGuardada);
 
@@ -64,6 +63,7 @@ public class RacionServiceImpl implements RacionService {
         racionEncontrada.setStockPreparado(dto.getStockPreparado());
         racionEncontrada.setStockRestante(dto.getStockPreparado());
         racionEncontrada.setReceta(recetaNueva);
+        racionEncontrada.setFechaVencimiento(dto.getFechaVencimiento());
 
         racionRepository.save(racionEncontrada);
 

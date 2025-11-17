@@ -1,6 +1,7 @@
 package com.daos.acosta_bonafede_spadola_unzaga.error;
 
 import com.daos.acosta_bonafede_spadola_unzaga.ExceptionPersonal.InsufficientStockException;
+import com.daos.acosta_bonafede_spadola_unzaga.ExceptionPersonal.InvalidDateException;
 import com.daos.acosta_bonafede_spadola_unzaga.ExceptionPersonal.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,10 @@ public class ExceptionHandler {
         return new ResponseEntity<>(errors, HttpStatus.NOT_FOUND);
     }
 
-    @org.springframework.web.bind.annotation.ExceptionHandler(MethodArgumentNotValidException.class)
+    @org.springframework.web.bind.annotation.ExceptionHandler({
+            MethodArgumentNotValidException.class,
+            InvalidDateException.class}
+    )
     public ResponseEntity<?> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         Map<String, Object> errors = new HashMap<>();
 

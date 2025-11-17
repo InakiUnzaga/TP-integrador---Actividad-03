@@ -1,8 +1,11 @@
 package com.daos.acosta_bonafede_spadola_unzaga.Presentation.Racion;
 
+import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+
+import java.time.LocalDateTime;
 
 @Getter
 public class RacionRequestDto {
@@ -12,4 +15,8 @@ public class RacionRequestDto {
 
     @NotNull(message = "debe agregar una receta")
     private int idReceta;
+
+    @NotNull(message = "debe agregar fecha de vencimiento")
+    @Future(message = "debe agregar una fecha mayor a la hoy")
+    private LocalDateTime fechaVencimiento;
 }
