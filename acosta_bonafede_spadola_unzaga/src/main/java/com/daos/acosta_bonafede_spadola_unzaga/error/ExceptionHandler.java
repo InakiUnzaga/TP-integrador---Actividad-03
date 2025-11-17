@@ -1,8 +1,10 @@
 package com.daos.acosta_bonafede_spadola_unzaga.error;
 
+import com.daos.acosta_bonafede_spadola_unzaga.ExceptionPersonal.Excepcion;
 import com.daos.acosta_bonafede_spadola_unzaga.ExceptionPersonal.InsufficientStockException;
 import com.daos.acosta_bonafede_spadola_unzaga.ExceptionPersonal.InvalidDateException;
 import com.daos.acosta_bonafede_spadola_unzaga.ExceptionPersonal.ResourceNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -46,5 +48,13 @@ public class ExceptionHandler {
 
         return new ResponseEntity<>(errors, HttpStatus.CONFLICT);
     }
+
+    @org.springframework.web.bind.annotation.ExceptionHandler(Excepcion.class)
+   public ResponseEntity<ErrorInfo> methodArgumentNotValidException(HttpServletRequest request, Excepcion e) {
+	   int statusCode= e.getStatusCode();
+	   
+	   ErrorInfo errorInfo = new ErrorInfo(HttpStatus.BAD_REQUEST.value(), e.getMessage(), request.getRequestURI());
+       return new ResponseEntity<>(errorInfo, HttpStatus.BAD_REQUEST);
+   }
 
 }
