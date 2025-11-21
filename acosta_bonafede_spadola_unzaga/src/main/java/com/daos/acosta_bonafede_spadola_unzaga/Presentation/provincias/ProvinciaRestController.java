@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,7 +41,7 @@ public class ProvinciaRestController {
 	/**
 	 * Obtiene todas las provincias registradas en el sistema.
 	 *  curl --location --request GET 'http://localhost:8081/provincias'
-	 * @param id
+	 * @param "ID"
 	 * @return
 	 * @throws Exception 
 	 */
@@ -75,8 +77,12 @@ public class ProvinciaRestController {
 		else
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 	}
-	
-	
-	
+
+    @org.springframework.web.bind.annotation.PostMapping
+    public ResponseEntity<Provincia> crear(@RequestBody Provincia provincia) throws Exception {
+        service.save(provincia);
+        return ResponseEntity.status(HttpStatus.CREATED).body(provincia);
+    }
+
 	
 }
