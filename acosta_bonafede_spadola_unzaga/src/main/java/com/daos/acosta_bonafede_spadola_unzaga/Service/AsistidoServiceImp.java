@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.daos.acosta_bonafede_spadola_unzaga.DAO.AsistidoDAO;
+import com.daos.acosta_bonafede_spadola_unzaga.entity.Asistencia;
 import com.daos.acosta_bonafede_spadola_unzaga.entity.Asistido;
 import com.daos.acosta_bonafede_spadola_unzaga.ExceptionPersonal.CheckedException;
 
@@ -17,12 +18,6 @@ public class AsistidoServiceImp implements AsistidoService {
     @Autowired
     private AsistidoDAO repoAsistido; 
     
-    // --- MÉTODOS DE LA INTERFAZ ---
-
-    /**
-     * Renombrado de 'save' a 'insert' para claridad en el contexto REST,
-     * manteniendo la lógica de validación de DNI de tu código original.
-     */
     @Override
     @Transactional
     public Asistido insert(Asistido asistido) throws CheckedException {
@@ -32,12 +27,23 @@ public class AsistidoServiceImp implements AsistidoService {
             asistido.setFechaRegistro(LocalDate.now());
         }
         
-     // CÓDIGO CORREGIDO PARA PERMITIR DNI NULO:
-        if (asistido.getDni() != null) { // <--- Ya no hay 'else' que lance la excepción
+
+        if (asistido.getDni() != null) {
             // Solo verifica unicidad si el DNI fue proporcionado
             Asistido existingAsistido = repoAsistido.findByDni(asistido.getDni());
             if (existingAsistido != null && (asistido.getId() == null || !existingAsistido.getId().equals(asistido.getId()))) {
                 throw new CheckedException("El DNI " + asistido.getDni() + " ya está registrado.", "dni");
+            }
+        }
+        
+     // 3. ESTABLECER LA RELACIÓN BIDIRECCIONAL (NUEVA LÓGICA)
+        // Esto asegura que la clave foránea (asistido_id) se establezca en cada Asistencia.
+        if (asistido.getAsistencias() != null && !asistido.getAsistencias().isEmpty()) {
+            for (Asistencia asistencia : asistido.getAsistencias()) {
+                // Utilizamos el setter directo o el método addAsistencia de la entidad Asistido,
+                // si el mapeo del DTO al POJO no lo hizo automáticamente.
+                // Si usamos el setter directo (setAsistido), es suficiente para la persistencia.
+                asistencia.setAsistido(asistido); 
             }
         }
         
@@ -54,7 +60,7 @@ public class AsistidoServiceImp implements AsistidoService {
     @Override
     @Transactional(readOnly = true)
     public boolean existsByDniButNotId(Long dni, Long id) {
-        // Se asume la existencia de findByDniAndIdNot en el DAO.
+     
         return repoAsistido.findByDniAndIdNot(dni, id).isPresent();
     }
 
@@ -62,27 +68,42 @@ public class AsistidoServiceImp implements AsistidoService {
     @Override
 	@Transactional
 	public Asistido update(Asistido asistido) {
-        // Asumo que las validaciones de unicidad de DNI y Nombre Completo
-        // se manejan en el RestController antes de llamar a update.
-        // Si no, la lógica de validación de DNI de 'insert' debe estar aquí también.
-        
-        // 1. Guardar (actualizar)
+    	
+    	// 3. ESTABLECER LA RELACIÓN BIDIRECCIONAL (NUEVA LÓGICA)
+        // Esto asegura que la clave foránea (asistido_id) se establezca en cada Asistencia.
+        if (asistido.getAsistencias() != null && !asistido.getAsistencias().isEmpty()) {
+            for (Asistencia asistencia : asistido.getAsistencias()) {
+                // Utilizamos el setter directo o el método addAsistencia de la entidad Asistido,
+                // si el mapeo del DTO al POJO no lo hizo automáticamente.
+                // Si usamos el setter directo (setAsistido), es suficiente para la persistencia.
+                asistencia.setAsistido(asistido); 
+            }
+        }	
+       
        return repoAsistido.save(asistido);
 	}
     
     @Override
     @Transactional(readOnly = true)
-    public Optional<Asistido> getById(Long id) {
-        // En tu implementación original usabas findById(id) que devolvía Asistido.
-        // Se adapta a devolver Optional<Asistido> para ser consistente con el patrón de CiudadRestController.java.
-        // Asumo que AsistidoDAO extiende JpaRepository, que tiene findById que devuelve Optional.
-        return repoAsistido.findById(id); 
+    public Optional<Asistido> getById(Long id) {      
+        Optional<Asistido> asistidoOptional = repoAsistido.findById(id); 
+
+        if (asistidoOptional.isPresent()) {
+            Asistido asistido = asistidoOptional.get();
+            
+            // FORZAR LA CARGA DE LA COLECCIÓN (Inicialización Eager)
+            // Esto evita el LazyInitializationException
+            if (asistido.getAsistencias() != null) {
+                asistido.getAsistencias().size(); 
+            }
+        }
+        return asistidoOptional;       
     }
     
     @Override
     @Transactional(readOnly = true)
     public List<Asistido> getAll() {
-        // Retorna todos los asistidos, asumiendo findAll() en el DAO.
+    	
         return repoAsistido.findAll();
     }
 
@@ -90,8 +111,8 @@ public class AsistidoServiceImp implements AsistidoService {
     @Override
     @Transactional
     public void logicalErase(Long id) throws CheckedException {
-        // Lógica de borrado lógico (inactivar) de tu código original
-        Asistido asistido = repoAsistido.findById(id).orElse(null); // Uso de Optional para ser más robusto.
+        // Lógica de borrado lógico (inactivar)
+        Asistido asistido = repoAsistido.findById(id).orElse(null); 
         
         if (asistido == null) {
             throw new CheckedException("Asistido no encontrado con ID: " + id, "id");
@@ -104,24 +125,23 @@ public class AsistidoServiceImp implements AsistidoService {
     @Override
     @Transactional
     public void delete(Long id) {
-        // Método de borrado físico, para ser consistente con CiudadRestController.java.
+        // Método de borrado físico, no pedido.
         repoAsistido.deleteById(id);
     }
-
 
     // --- MÉTODOS DE VALIDACIÓN DE UNICIDAD ---
     
     @Override
     @Transactional(readOnly = true)
     public boolean existsByNombreCompleto(String nombreCompleto) {    
-        // CORRECCIÓN: Usamos isEmpty() en la lista y negamos el resultado.
+      
         return !repoAsistido.findByNombreContaining(nombreCompleto).isEmpty();
     }
 
     @Override
     @Transactional(readOnly = true)
     public boolean existsByDni(Long dni) {
-        // Verifica si el DNI existe (uso de tu método findByDni y conversión a booleano).
+      
         return repoAsistido.findByDni(dni) != null;
     }
 
