@@ -4,6 +4,7 @@ package com.daos.acosta_bonafede_spadola_unzaga.Presentation.Asistencia;
 import lombok.*;
 import org.springframework.hateoas.RepresentationModel;
 
+
 import com.daos.acosta_bonafede_spadola_unzaga.entity.Asistencia;
 
 import java.time.LocalDateTime;
@@ -20,6 +21,7 @@ public class AsistenciaResponseDto extends RepresentationModel<AsistenciaRespons
     private String nombreAsistido;
     private String descripcionReceta;
     private LocalDateTime fechaVencimientoRacion;
+
     
     public AsistenciaResponseDto(Asistencia asistencia) {
         this.id = asistencia.getId();
