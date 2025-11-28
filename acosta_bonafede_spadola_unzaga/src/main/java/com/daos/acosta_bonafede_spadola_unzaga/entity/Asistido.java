@@ -1,9 +1,16 @@
 package com.daos.acosta_bonafede_spadola_unzaga.entity;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.OneToMany;
+
+
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -11,7 +18,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
 
-@Entity 
+@Entity
+@DiscriminatorValue("ASISTIDO")
 public class Asistido{	
 		
 	@Id
@@ -23,6 +31,9 @@ public class Asistido{
 	private LocalDate fechaNacimiento;
     private Integer edad; 
     
+    @OneToMany(mappedBy = "asistido", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Asistencia> asistencias = new ArrayList<>();
+    
     // Realcion con Ciudad
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_ciudad", referencedColumnName = "id", nullable = false) 
@@ -31,6 +42,15 @@ public class Asistido{
     private LocalDate fechaRegistro;
     @NotNull
     private boolean estaActiva = true;
+    
+    
+    public List<Asistencia> getAsistencias() {
+        return asistencias;
+    }
+    
+    public void setAsistencias(List<Asistencia> asistencias) {
+        this.asistencias = asistencias;
+    }
     
     public Long getId() {
         return id;
@@ -98,6 +118,22 @@ public class Asistido{
 		this.fechaRegistro = fechaRegistro;
 		this.estaActiva = estaActiva;
 	}
+	
+	/**
+     * Añade una asistencia a la lista y establece la referencia bidireccional.
+     */
+    public void addAsistencia(Asistencia asistencia) {
+        this.asistencias.add(asistencia);
+        asistencia.setAsistido(this); // <-- ESTO ES CLAVE PARA PERSISTIR LA CLAVE FORÁNEA
+    }
+
+    /**
+     * Elimina una asistencia de la lista y rompe la referencia bidireccional.
+     */
+    public void removeAsistencia(Asistencia asistencia) {
+        this.asistencias.remove(asistencia);
+        asistencia.setAsistido(null); // Rompe la referencia
+    }
 
 	public Asistido() {}
      
