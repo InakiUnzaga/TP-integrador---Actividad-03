@@ -12,6 +12,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @AllArgsConstructor
 public class RacionServiceImpl implements RacionService {
@@ -29,6 +32,13 @@ public class RacionServiceImpl implements RacionService {
         );
 
         return racionDtoMapper.toDto(racionEncontrada);
+    }
+
+    @Override
+    public List<RacionDto> obtenerRaciones() {
+        return racionRepository.findAll().stream()
+                .map(racionDtoMapper::toDto)
+                .collect(Collectors.toList());
     }
 
     @Override

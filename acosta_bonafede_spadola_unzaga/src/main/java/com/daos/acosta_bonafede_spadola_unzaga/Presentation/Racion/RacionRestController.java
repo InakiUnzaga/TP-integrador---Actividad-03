@@ -2,17 +2,21 @@ package com.daos.acosta_bonafede_spadola_unzaga.Presentation.Racion;
 
 import com.daos.acosta_bonafede_spadola_unzaga.Presentation.Receta.RecetaRestController;
 import com.daos.acosta_bonafede_spadola_unzaga.Service.RacionService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 @RestController
 @AllArgsConstructor
 @RequestMapping("/raciones")
+@Tag(name = "Raciones")
 public class RacionRestController {
 
     private final RacionService racionService;
@@ -21,6 +25,13 @@ public class RacionRestController {
     public ResponseEntity<RacionDto> obtenerRacion(@PathVariable int id) {
         RacionDto racionDto = racionService.obtenerRacion(id);
         return ResponseEntity.ok(construirRespuestaGet(racionDto));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<RacionDto>> obtenerRaciones() {
+        List<RacionDto> raciones = racionService.obtenerRaciones();
+        raciones.forEach(this::construirRespuestaGet);
+        return ResponseEntity.ok(raciones);
     }
 
     @PostMapping
